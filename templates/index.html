@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flask Calculator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a2e;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .calculator {
+      background: #16213e;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      width: 340px;
+    }
+
+    h1 {
+      color: #e94560;
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      color: #a8b2d8;
+      font-size: 0.85rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0f3460;
+      border: 1px solid #e94560;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1.1rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: #fff;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    button:active { transform: scale(0.96); }
+
+    .btn-add      { background: #4ecca3; color: #1a1a2e; }
+    .btn-subtract { background: #e94560; color: #fff; }
+    .btn-multiply { background: #f5a623; color: #1a1a2e; }
+    .btn-divide   { background: #a78bfa; color: #1a1a2e; }
+
+    .result {
+      margin-top: 24px;
+      background: #0f3460;
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-label {
+      color: #a8b2d8;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    .result-value {
+      color: #4ecca3;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .result-value.error {
+      color: #e94560;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h1>Flask Calculator</h1>
+
+    <div class="input-group">
+      <label>First Number (X)</label>
+      <input type="number" id="x" placeholder="e.g. 10" />
+    </div>
+
+    <div class="input-group">
+      <label>Second Number (Y)</label>
+      <input type="number" id="y" placeholder="e.g. 5" />
+    </div>
+
+    <div class="buttons">
+      <button class="btn-add"      onclick="calculate('/add')">➕ Add</button>
+      <button class="btn-subtract" onclick="calculate('/subtract')">➖ Subtract</button>
+      <button class="btn-multiply" onclick="calculate('/multiply')">✖️ Multiply</button>
+      <button class="btn-divide"   onclick="calculate('/division')">➗ Divide</button>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Result</div>
+      <div class="result-value" id="result">—</div>
+    </div>
+  </div>
+
+  <script>
+    async function calculate(endpoint) {
+      const x = parseFloat(document.getElementById('x').value);
+      const y = parseFloat(document.getElementById('y').value);
+      const resultEl = document.getElementById('result');
+
+      if (isNaN(x) || isNaN(y)) {
+        resultEl.textContent = 'Enter both numbers';
+        resultEl.className = 'result-value error';
+        return;
+      }
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ x, y })
+        });
+
+        const data = await response.json();
+        resultEl.textContent = data.Message;
+        resultEl.className = 'result-value';
+      } catch (err) {
+        resultEl.textContent = 'Error calling API';
+        resultEl.className = 'result-value error';
+      }
+    }
+  </script>
+</body>
+</html>
